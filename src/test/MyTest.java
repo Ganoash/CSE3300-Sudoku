@@ -98,20 +98,22 @@ public class MyTest {
 
     @Test
     public void testAllSudoku() {
-        for(String dir : new String[] {"./data/basic/", "./data/pruning/" , "./data/var_selection/"}) {
-            System.out.println("testing " + dir);
-            String[] local= Util.readAllSudokus(dir);
-            for(String f : local) {
-                System.out.println("testing " + dir + f);
-                int[][] sudoku = Util.readerUtil(dir+f);
-                int[][] solution = Solution.solve(sudoku);
-                assertTrue(check(sudoku, solution));
+        for (int i = 0; i < 2; i++) {
+            for(String dir : new String[] {"./data/basic/", "./data/pruning/" , "./data/var_selection/"}) {
+                // System.out.println("testing " + dir);
+                String[] local= Util.readAllSudokus(dir);
+                for(String f : local) {
+                    // System.out.println("testing " + dir + f);
+                    int[][] sudoku = Util.readerUtil(dir+f);
+                    int[][] solution = Solution.solve(sudoku);
+                    assertTrue(check(sudoku, solution));
+                }
             }
         }
     }
 
     public boolean check(int[][] original, int[][] sudoku) {
-        if (sudoku == null) {
+        if (sudoku == null || sudoku.length == 0) {
             return false;
         }
 
