@@ -98,18 +98,21 @@ public class MyTest {
 
     @Test
     public void testAllSudoku() {
-        for (int i = 0; i < 2; i++) {
-            for(String dir : new String[] {"./data/basic/", "./data/pruning/" , "./data/var_selection/"}) {
-                // System.out.println("testing " + dir);
-                String[] local= Util.readAllSudokus(dir);
-                for(String f : local) {
-                    // System.out.println("testing " + dir + f);
-                    int[][] sudoku = Util.readerUtil(dir+f);
+        long total = 0;
+        for (int i = 0; i < 1; i++) {
+            for (String dir : new String[]{"./data/basic/", "./data/pruning/", "./data/var_selection/"}) {
+                String[] local = Util.readAllSudokus(dir);
+                for (String f : local) {
+                    int[][] sudoku = Util.readerUtil(dir + f);
+                    long time = System.currentTimeMillis();
                     int[][] solution = Solution.solve(sudoku);
+                    long elapsed = System.currentTimeMillis() - time;
+                    total += elapsed;
                     assertTrue(check(sudoku, solution));
                 }
             }
         }
+        System.out.println("Total time elapsed: " + total);
     }
 
     public boolean check(int[][] original, int[][] sudoku) {
