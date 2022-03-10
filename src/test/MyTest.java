@@ -42,18 +42,6 @@ public class MyTest {
     }
 
     @Test
-    void testExample() throws InvalidObjectException {
-        int[][] sudoku = Util.readerUtil("./data/pruning/size5_level30_puzzle19.txt");
-        System.out.println(Arrays.deepToString(sudoku));
-
-        int[][] solution = Solution.solve(sudoku);
-
-        assertEquals(solution[8][6], 3);
-        assertEquals(solution[4][6], 5);
-
-    }
-
-    @Test
     void testExample2() throws InvalidObjectException {
         int[][] sudoku = Util.readerUtil("./data/basic/size3_level10_puzzle2.txt");
 
