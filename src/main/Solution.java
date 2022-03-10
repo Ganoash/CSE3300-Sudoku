@@ -9,7 +9,12 @@ class Solution {
      * @return the fully filled sudoku grid.
      */
     public static int[][] solve(int[][] grid) {
-        return grid;
+        Grid g = new Grid(grid);
+        Queue<Grid> gridQueue = new ArrayDeque<>();
+
+        while (true) {
+
+        }
     }
 }
 
@@ -27,11 +32,44 @@ class Grid {
     private final BitSet flags;
     private final BitSet propagated;
 
+    public Grid(int n) {
+        this.n = n;
+        ns = (int) Math.sqrt(n);
+        // init all true flags bitset
+        flags = new BitSet(n*n*n);
+        flags.flip(0, n*n*n);
+        // init all true propagated bitset
+        propagated = new BitSet(n*n);
+        propagated.flip(0, n*n);
+    }
     public Grid(int[][] grid) {
         n = grid.length;
         ns = (int) Math.sqrt(n);
+        // init all true flags bitset
         flags = new BitSet(n*n*n);
+        flags.flip(0, n*n*n);
+        // init all true propagated bitset
         propagated = new BitSet(n*n);
+        propagated.flip(0, n*n);
+        init(grid);
+    }
+
+    private Grid(int n,int ns, BitSet flags, BitSet propagated) {
+        this.n = n;
+        this.ns = ns;
+        this.flags = flags;
+        this.propagated = propagated;
+    }
+
+    public void init(int[][] grid) {
+        for(int x = 0; x < n; x++) {
+            for(int y = 0; y < n; y++) {
+                if(grid[x][y] == -1) {
+                    continue;
+                }
+                fillInFor(grid[x][y], x, y);
+            }
+        }
     }
 
     /**
@@ -65,6 +103,19 @@ class Grid {
     }
 
     /**
+     * returns the amount of true flags in the bitset
+     * @param bs
+     * @return
+     */
+    public int count(BitSet bs) {
+        int c = 0;
+        for (int i = bs.nextSetBit(0); i >= 0; i = bs.nextSetBit(i+1)) {
+            c+=1;
+        }
+        return c;
+    }
+
+    /**
      * Check wether a block can be solved, use isPropagated to check if it is propagated in de sudoku already
      * @param x
      * @param y
@@ -72,11 +123,7 @@ class Grid {
      */
     public boolean isSolved(int x, int y) {
         BitSet bs = block(x, y);
-        int count = 0;
-        for (int i = bs.nextSetBit(0); i >= 0; i = bs.nextSetBit(i+1)) {
-            count+=1;
-        }
-        return count==1;
+        return count(bs)==1;
     }
 
     /**
@@ -87,7 +134,7 @@ class Grid {
      * @return
      */
     public void mark(int f, int x, int y) {
-        if(!flags.get(index(x, y, f))) {
+        if(flags.get(index(x, y, f))) {
             flags.flip(index(x, y, f));
         }
     }
@@ -98,7 +145,7 @@ class Grid {
     public void fillInFor(int f, int x, int y) {
         // set propagated to 1 for this x and y
         // set all other flags to false for this x and y
-        // propagte marking these flags to all other relevant squares
+        // propagate marking these flags to all other relevant squares
 
     }
 
@@ -107,6 +154,37 @@ class Grid {
      */
     public int[] getMinimumBlock() {
         // loop over all squares in the grid. Return the x and y of the square with the least 'true' flags
+        // don't consider propagated squares
+        int minimum = Integer.MAX_VALUE;
+        int[] x_and_y = new int[2];
+        for(int x = 0 ; x < n; x++) {
+            for(int y = 0; y < n; y++) {
+                // block is propagated and should not be considered
+                if(propagated.get(x*n+y)) {
+                    continue;
+                }
+                //get block and count true flags
+                BitSet bs = block(x, y);
+                int c = count(bs);
+                // iff smaller than smallest seen update x and y data
+                if(c < minimum) {
+                    minimum = c;
+                    x_and_y[0] = x;
+                    x_and_y[1] = y;
+                }
+            }
+        }
+        // return smallest x and y seen
+        return x_and_y;
+    }
+
+    public Grid copy() {
+        BitSet newFlags = new BitSet(n*n*n);
+        BitSet newProp = new BitSet(n*n*n);
+        newFlags.or(flags);
+        newProp.or(propagated);
+
+        return new Grid(n, ns, newFlags, newProp);
     }
 
 
