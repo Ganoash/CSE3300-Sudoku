@@ -3,6 +3,7 @@ package test;
 import main.Util;
 import main.Solution;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import java.io.InvalidObjectException;
@@ -86,5 +87,84 @@ public class MyTest {
         assertEquals(solution[6][6], 1);
         assertEquals(solution[8][6], 8);
         assertEquals(solution[8][7], 4);
+    }
+
+    @Test
+    void testExample4() throws InvalidObjectException {
+        int[][] sudoku = Util.readerUtil("./data/basic/size3_level10_puzzle2.txt");
+
+        int[][] solution = Solution.solve(sudoku);
+
+        assertTrue(check(sudoku, solution));
+    }
+
+    @Test
+    void testExample5() throws InvalidObjectException {
+        int[][] sudoku = Util.readerUtil("./data/pruning/size3_level20_puzzle1.txt");
+
+        int[][] solution = Solution.solve(sudoku);
+
+        assertTrue(check(sudoku, solution));
+    }
+
+    public boolean check(int[][] original, int[][] sudoku) {
+        if (sudoku == null) {
+            return false;
+        }
+
+        int shouldBe = (sudoku.length) * (sudoku.length + 1) / 2;
+        for (int i = 0; i < sudoku.length; i++ ){
+            int sum = 0;
+            for (int j = 0; j < sudoku.length; j++) {
+                sum += sudoku[i][j];
+            }
+            if (sum != shouldBe) {
+                System.out.println("HORIZONTAL: returning false because: " + sum + " is not equal to: " + shouldBe);
+                return false;
+            }
+        }
+
+        // Check vertical
+        for (int i = 0; i < sudoku.length; i++ ){
+            int sum = 0;
+            for (int j = 0; j < sudoku.length; j++) {
+                sum += sudoku[j][i];
+            }
+            if (sum != shouldBe) {
+                System.out.println("VERTICAL: returning false because: " + sum + " is not equal to: " + shouldBe);
+                return false;
+            }
+        }
+
+        // Check blocks
+        int ns = (int) Math.sqrt((double) sudoku.length);
+        for (int blockI = 0; blockI < ns; blockI++) {
+            for (int blockJ = 0; blockJ < ns; blockJ++) {
+                // Check this block!
+                // System.out.println("Checking a new block!");
+                int sum = 0;
+                for (int i = blockI*ns; i < blockI*ns + ns; i++) {
+                    for (int j = blockJ*ns; j < blockJ*ns + ns; j++) {
+                        // System.out.printf("Checking the block at (%d, %d)\n", i, j);
+                        sum += sudoku[i][j];
+                    }
+                }
+                if (sum != shouldBe) {
+                    System.out.println("BLOCK: returning false because: " + sum + " is not equal to: " + shouldBe);
+                    return false;
+                }
+            }
+        }
+
+        // Check no changes
+        for (int i = 0; i < sudoku.length; i++ ){
+            for (int j = 0; j < sudoku.length; j++) {
+                if (original[i][j] != sudoku[i][j] && original[i][j] != -1) {
+                    System.out.println("The matrix was changed in illegal ways");
+                }
+            }
+        }
+
+        return true;
     }
 }
