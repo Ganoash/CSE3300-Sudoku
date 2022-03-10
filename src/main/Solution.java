@@ -163,8 +163,8 @@ class Grid {
         // Fill in local block.
         int originX = (int) Math.floor((float) x / ns);
         int originY = (int) Math.floor((float) y / ns);
-        for (int i = originX; i < originX + ns; i++) {
-            for (int j = originY; j < originY + ns; j++) {
+        for (int i = originX*ns; i < originX*ns + ns; i++) {
+            for (int j = originY*ns; j < originY*ns + ns; j++) {
                 flags.set(index(i, j, f), false);
             }
         }
