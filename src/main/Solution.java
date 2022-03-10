@@ -140,13 +140,41 @@ class Grid {
     }
 
     /**
-     *
+     * This method fills in the desired value for this x and y.
+     * The location is set to propagated so it won't be changed again.
+     * The consequences for filling this square, will also be handled.
+     * That means filling in the relevant flags in the horizontal and
+     * vertical direction, as well as the local block.
      */
     public void fillInFor(int f, int x, int y) {
-        // set propagated to 1 for this x and y
-        // set all other flags to false for this x and y
-        // propagate marking these flags to all other relevant squares
+        // Set this to propagated.
+        propagated.set(x * n + y, true);
 
+        // Fill in horizontal
+        for (int i = 0; i < n; i++) {
+            flags.set(index(i, y, f), false);
+        }
+
+        // Fill in vertical
+        for (int i = 0; i < n; i++) {
+            flags.set(index(x, i, f), false);
+        }
+
+        // Fill in local block.
+        int originX = (int) Math.floor((float) x / ns);
+        int originY = (int) Math.floor((float) y / ns);
+        for (int i = originX; i < originX + ns; i++) {
+            for (int j = originY; j < originY + ns; j++) {
+                flags.set(index(i, j, f), false);
+            }
+        }
+
+        // Set the square to the correct flag.
+        // This is done last to simplify filling in (the above stuff).
+        for (int i = index(x, y); i < index(x, y) + n; i++) {
+            flags.set(i, false); // Assuming this is necessary.
+        }
+        flags.set(index(x, y, f), true);
     }
 
     /**
