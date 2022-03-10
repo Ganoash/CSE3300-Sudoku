@@ -17,6 +17,7 @@ public class Solution {
         while (!gridQueue.isEmpty()) {
             Grid g = gridQueue.poll();
             if(g.isSolved()) {
+                g.print();
                 return g.toArray();
             }
             int[] x_minimum_y =  g.getMinimumBlock();
@@ -25,6 +26,7 @@ public class Solution {
             // sudoku easy case: a block can be filled in
             while(count <= 1) {
                 if(g.isSolved()) {
+                    g.print();
                     return g.toArray();
                 }
                 if (count == 0) {
@@ -85,7 +87,6 @@ class Grid {
         flags.flip(0, n*n*n);
         // init all true propagated bitset
         propagated = new BitSet(n*n);
-        propagated.flip(0, n*n);
         init(grid);
     }
 
@@ -307,7 +308,7 @@ class Grid {
             System.out.println();
             for(int y = 0; y < n; y++) {
                 System.out.print(toPrint[x][y]);
-                System.out.print(" ");
+                System.out.print("\t");
             }
         }
     }
