@@ -17,7 +17,7 @@ public class Solution {
         while (!gridQueue.isEmpty()) {
             Grid g = gridQueue.pop();
             if(g.isSolved()) {
-                g.print();
+                // g.print();
                 return g.toArray();
             }
             int[] x_minimum_y =  g.getMinimumBlock();
@@ -26,7 +26,7 @@ public class Solution {
             // sudoku easy case: a block can be filled in
             while(count <= 1) {
                 if(g.isSolved()) {
-                    g.print();
+                    // g.print();
                     return g.toArray();
                 }
                 if (count == 0) {
