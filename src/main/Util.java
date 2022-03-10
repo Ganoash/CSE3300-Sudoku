@@ -1,3 +1,5 @@
+package main;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Scanner;
@@ -23,7 +25,6 @@ public class Util {
 
         int length = Integer.parseInt(inFile.nextLine());
         int bla = Integer.parseInt(inFile.nextLine()); // No idea what this does?
-        System.out.println("length: " + length);
 
         int[][] result = new int[length*length][length*length];
 
