@@ -1,8 +1,12 @@
 package test;
 
 import main.Util;
+import main.Solution;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
+
+import java.io.InvalidObjectException;
+import java.util.Arrays;
 
 public class MyTest {
 
@@ -34,5 +38,18 @@ public class MyTest {
 
     int util(int val) {
         return (int) Math.floor((float) val / 3);
+    }
+
+    @Test
+    void testExample() throws InvalidObjectException {
+        int[][] sudoku = Util.readerUtil("./data/basic/size3_level5_puzzle1.txt");
+        System.out.println(Arrays.deepToString(sudoku));
+
+        int[][] solution = Solution.solve(sudoku);
+        System.out.println(Arrays.deepToString(solution));
+
+        assertEquals(solution[8][6], 3);
+        assertEquals(solution[4][6], 5);
+
     }
 }

@@ -1,7 +1,8 @@
 package main;
+import java.io.InvalidObjectException;
 import java.util.*;
 
-class Solution {
+public class Solution {
 
     /**
      * Returns the filled in sudoku grid.
@@ -9,12 +10,45 @@ class Solution {
      * @return the fully filled sudoku grid.
      */
     public static int[][] solve(int[][] grid) {
-        Grid g = new Grid(grid);
+        Grid start = new Grid(grid);
         Queue<Grid> gridQueue = new ArrayDeque<>();
+        gridQueue.add(start);
 
-        while (true) {
+        while (!gridQueue.isEmpty()) {
+            Grid g = gridQueue.poll();
+            if(g.isSolved()) {
+                return g.toArray();
+            }
+            int[] x_minimum_y =  g.getMinimumBlock();
+            BitSet block = g.block(x_minimum_y[0], x_minimum_y[1]);
+            int count = g.count(block);
+            // sudoku easy case: a block can be filled in
+            while(count <= 1) {
+                if(g.isSolved()) {
+                    return g.toArray();
+                }
+                if (count == 0) {
+                    // throw new InvalidObjectException("Sudoku can't be solved!!!! :(");
+                    return new int[][] {};
+                }
+                if (count == 1) {
+                    g.fillInFor(g.getFirstFlag(block), x_minimum_y[0], x_minimum_y[1]);
+                }
+                x_minimum_y = g.getMinimumBlock();
+                block = g.block(x_minimum_y[0], x_minimum_y[1]);
+                count = g.count(block);
+            }
 
+            // sudoku hard case: no block can be filled in for certain, add parallel searching
+            int[] flags = g.getFlags(block);
+            for (int i = 0; i < count; i++) {
+                Grid clone = g.copy();
+                clone.fillInFor(flags[i], x_minimum_y[0], x_minimum_y[1]);
+                gridQueue.add(clone);
+            }
         }
+
+        return null;
     }
 }
 
@@ -42,6 +76,7 @@ class Grid {
         propagated = new BitSet(n*n);
         propagated.flip(0, n*n);
     }
+
     public Grid(int[][] grid) {
         n = grid.length;
         ns = (int) Math.sqrt(n);
@@ -67,7 +102,7 @@ class Grid {
                 if(grid[x][y] == -1) {
                     continue;
                 }
-                fillInFor(grid[x][y], x, y);
+                fillInFor(grid[x][y]-1, x, y);
             }
         }
     }
@@ -140,6 +175,33 @@ class Grid {
     }
 
     /**
+     *
+     */
+    public int getFirstFlag(BitSet bs) {
+        for(int i = 0; i < n; i++) {
+            if(bs.get(i)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     *
+     */
+    public int[] getFlags(BitSet bs) {
+        int[] flags = new int[count(bs)];
+        int f_i = 0;
+        for(int i = 0; i < n; i++) {
+            if(bs.get(i)) {
+                flags[f_i] = i;
+                f_i++;
+            }
+        }
+        return flags;
+    }
+
+    /**
      * This method fills in the desired value for this x and y.
      * The location is set to propagated so it won't be changed again.
      * The consequences for filling this square, will also be handled.
@@ -208,12 +270,48 @@ class Grid {
 
     public Grid copy() {
         BitSet newFlags = new BitSet(n*n*n);
-        BitSet newProp = new BitSet(n*n*n);
+        BitSet newProp = new BitSet(n*n);
         newFlags.or(flags);
         newProp.or(propagated);
 
         return new Grid(n, ns, newFlags, newProp);
     }
+
+    public boolean isSolved() {
+        boolean solved = true;
+        for(int x = 0; x < n; x++) {
+            for(int y = 0; y < n; y++) {
+                solved = solved && propagated.get(n*x+y);
+            }
+        }
+        return solved;
+    }
+
+    public int[][] toArray() {
+        int[][] ret = new int[n][n];
+        for(int x = 0; x < n; x++) {
+            for(int y = 0; y < n; y++) {
+                if(propagated.get(x*n+y)) {
+                    ret[x][y] = getFirstFlag(block(x, y))+1;
+                } else {
+                    ret[x][y] = -1;
+                }
+            }
+        }
+        return ret;
+    }
+
+    public void print() {
+        int[][] toPrint = toArray();
+        for(int x = 0; x < n; x++) {
+            System.out.println();
+            for(int y = 0; y < n; y++) {
+                System.out.print(toPrint[x][y]);
+                System.out.print(" ");
+            }
+        }
+    }
+
 
 
 }
