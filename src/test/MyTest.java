@@ -43,7 +43,8 @@ public class MyTest {
 
     @Test
     void testExample() throws InvalidObjectException {
-        int[][] sudoku = Util.readerUtil("./data/basic/size3_level5_puzzle1.txt");
+        int[][] sudoku = Util.readerUtil("./data/pruning/size5_level30_puzzle19.txt");
+        System.out.println(Arrays.deepToString(sudoku));
 
         int[][] solution = Solution.solve(sudoku);
 
