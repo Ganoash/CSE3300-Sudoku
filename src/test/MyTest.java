@@ -52,4 +52,21 @@ public class MyTest {
         assertEquals(solution[4][6], 5);
 
     }
+
+    @Test
+    void testExample2() throws InvalidObjectException {
+        int[][] sudoku = Util.readerUtil("./data/basic/size3_level10_puzzle2.txt");
+        System.out.println(Arrays.deepToString(sudoku));
+
+        int[][] solution = Solution.solve(sudoku);
+        System.out.println(Arrays.deepToString(solution));
+
+        assertEquals(solution[2][3], 3);
+        assertEquals(solution[2][6], 7);
+        assertEquals(solution[2][8], 1);
+        assertEquals(solution[5][0], 5);
+        assertEquals(solution[7][2], 4);
+        assertEquals(solution[7][3], 8);
+        assertEquals(solution[8][3], 1);
+    }
 }
