@@ -43,10 +43,8 @@ public class MyTest {
     @Test
     void testExample() throws InvalidObjectException {
         int[][] sudoku = Util.readerUtil("./data/basic/size3_level5_puzzle1.txt");
-        System.out.println(Arrays.deepToString(sudoku));
 
         int[][] solution = Solution.solve(sudoku);
-        System.out.println(Arrays.deepToString(solution));
 
         assertEquals(solution[8][6], 3);
         assertEquals(solution[4][6], 5);
@@ -56,10 +54,8 @@ public class MyTest {
     @Test
     void testExample2() throws InvalidObjectException {
         int[][] sudoku = Util.readerUtil("./data/basic/size3_level10_puzzle2.txt");
-        System.out.println(Arrays.deepToString(sudoku));
 
         int[][] solution = Solution.solve(sudoku);
-        System.out.println(Arrays.deepToString(solution));
 
         assertEquals(solution[2][3], 3);
         assertEquals(solution[2][6], 7);
@@ -67,6 +63,28 @@ public class MyTest {
         assertEquals(solution[5][0], 5);
         assertEquals(solution[7][2], 4);
         assertEquals(solution[7][3], 8);
-        assertEquals(solution[8][3], 1);
+        assertEquals(solution[8][5], 1);
+    }
+
+    @Test
+    void testExample3() throws InvalidObjectException {
+        int[][] sudoku = Util.readerUtil("./data/pruning/size3_level20_puzzle1.txt");
+
+        int[][] solution = Solution.solve(sudoku);
+
+        assertEquals(solution[0][1], 9);
+        assertEquals(solution[0][3], 5);
+        assertEquals(solution[0][7], 2);
+        assertEquals(solution[1][6], 3);
+        assertEquals(solution[2][4], 2);
+        assertEquals(solution[3][2], 7);
+        assertEquals(solution[3][5], 3);
+        assertEquals(solution[4][7], 8);
+        assertEquals(solution[5][0], 8);
+        assertEquals(solution[6][3], 3);
+        assertEquals(solution[6][4], 8);
+        assertEquals(solution[6][6], 1);
+        assertEquals(solution[8][6], 8);
+        assertEquals(solution[8][7], 4);
     }
 }
