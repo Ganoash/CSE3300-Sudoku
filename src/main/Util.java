@@ -1,5 +1,6 @@
 package main;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Scanner;
@@ -10,6 +11,11 @@ public class Util {
 
         // Example
         int[][] sudoku = readerUtil("./data/basic/size3_level0_puzzle1.txt");
+    }
+
+    public static String[] readAllSudokus(String directory) {
+        File dir = new File(directory);
+        return dir.list();
     }
 
     public static int[][] readerUtil(String location) {

@@ -88,4 +88,19 @@ public class MyTest {
         assertEquals(solution[8][6], 8);
         assertEquals(solution[8][7], 4);
     }
+
+    @Test
+    public void testAllSudoku() {
+        for(String dir : new String[] {"./data/basic/", "./data/pruning/" , "./data/var_selection/"}) {
+            System.out.println("testing " + dir);
+            String[] local= Util.readAllSudokus(dir);
+            for(String f : local) {
+                System.out.println("testing " + dir + f);
+                int[][] sudoku = Util.readerUtil(dir+f);
+                Solution.solve(sudoku);
+            }
+
+        }
+
+    }
 }

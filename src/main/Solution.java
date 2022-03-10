@@ -11,11 +11,11 @@ public class Solution {
      */
     public static int[][] solve(int[][] grid) {
         Grid start = new Grid(grid);
-        Queue<Grid> gridQueue = new ArrayDeque<>();
+        Stack<Grid> gridQueue = new Stack<>();
         gridQueue.add(start);
 
         while (!gridQueue.isEmpty()) {
-            Grid g = gridQueue.poll();
+            Grid g = gridQueue.pop();
             if(g.isSolved()) {
                 g.print();
                 return g.toArray();
@@ -46,7 +46,7 @@ public class Solution {
             for (int i = 0; i < count; i++) {
                 Grid clone = g.copy();
                 clone.fillInFor(flags[i], x_minimum_y[0], x_minimum_y[1]);
-                gridQueue.add(clone);
+                gridQueue.push(clone);
             }
         }
 
@@ -311,6 +311,7 @@ class Grid {
                 System.out.print("\t");
             }
         }
+        System.out.println();
     }
 
 
