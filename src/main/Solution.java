@@ -1,3 +1,4 @@
+package main;
 import java.util.*;
 
 class Solution {
@@ -90,5 +91,23 @@ class Grid {
             flags.flip(index(x, y, f));
         }
     }
+
+    /**
+     *
+     */
+    public void fillInFor(int f, int x, int y) {
+        // set propagated to 1 for this x and y
+        // set all other flags to false for this x and y
+        // propagte marking these flags to all other relevant squares
+
+    }
+
+    /**
+     *
+     */
+    public int[] getMinimumBlock() {
+        // loop over all squares in the grid. Return the x and y of the square with the least 'true' flags
+    }
+
 
 }
