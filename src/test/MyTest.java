@@ -110,19 +110,29 @@ public class MyTest {
 
     @Test
     public void testAllSudoku() {
+        long total = 0;
         for(String dir : new String[] {"./data/basic/", "./data/pruning/" , "./data/var_selection/"}) {
             System.out.println("testing " + dir);
             String[] local= Util.readAllSudokus(dir);
             for(String f : local) {
                 System.out.println("testing " + dir + f);
+
                 int[][] sudoku = Util.readerUtil(dir+f);
+                long time = System.currentTimeMillis();
                 int[][] solution = Solution.solve(sudoku);
+                long elapsed = System.currentTimeMillis()-time;
+                System.out.println("elapsed: " + elapsed);
                 assertTrue(check(sudoku, solution));
+                total+=elapsed;
             }
         }
+        System.out.println("Total time elapsed: " +total);
     }
 
     public boolean check(int[][] original, int[][] sudoku) {
+        if(sudoku.length == 0) {
+            return false;
+        }
         if (sudoku == null) {
             return false;
         }

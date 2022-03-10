@@ -1,5 +1,4 @@
 package main;
-import java.io.InvalidObjectException;
 import java.util.*;
 
 public class Solution {
@@ -11,11 +10,11 @@ public class Solution {
      */
     public static int[][] solve(int[][] grid) {
         Grid start = new Grid(grid);
-        Stack<Grid> gridQueue = new Stack<>();
-        gridQueue.add(start);
+        Stack<Grid> gridStack = new Stack<>();
+        gridStack.add(start);
 
-        while (!gridQueue.isEmpty()) {
-            Grid g = gridQueue.pop();
+        while (!gridStack.isEmpty()) {
+            Grid g = gridStack.pop();
             if(g.isSolved()) {
                 // g.print();
                 return g.toArray();
@@ -23,6 +22,7 @@ public class Solution {
             int[] x_minimum_y =  g.getMinimumBlock();
             BitSet block = g.block(x_minimum_y[0], x_minimum_y[1]);
             int count = g.count(block);
+            boolean to_continue = false;
             // sudoku easy case: a block can be filled in
             while(count <= 1) {
                 if(g.isSolved()) {
@@ -30,8 +30,8 @@ public class Solution {
                     return g.toArray();
                 }
                 if (count == 0) {
-                    // throw new InvalidObjectException("Sudoku can't be solved!!!! :(");
-                    return new int[][] {};
+                    to_continue = true;
+                    break;
                 }
                 if (count == 1) {
                     g.fillInFor(g.getFirstFlag(block), x_minimum_y[0], x_minimum_y[1]);
@@ -40,13 +40,17 @@ public class Solution {
                 block = g.block(x_minimum_y[0], x_minimum_y[1]);
                 count = g.count(block);
             }
+            if(to_continue) {
+                continue;
+            }
 
-            // sudoku hard case: no block can be filled in for certain, add parallel searching
-            int[] flags = g.getFlags(block);
-            for (int i = 0; i < count; i++) {
+            while(count != 0) {
+                int flag = g.getBestFlag(block);
                 Grid clone = g.copy();
-                clone.fillInFor(flags[i], x_minimum_y[0], x_minimum_y[1]);
-                gridQueue.push(clone);
+                clone.fillInFor(flag, x_minimum_y[0], x_minimum_y[1]);
+                gridStack.push(clone);
+                block.flip(flag);
+                count--;
             }
         }
 
@@ -67,6 +71,7 @@ class Grid {
     private final int ns;
     private final BitSet flags;
     private final BitSet propagated;
+    private final int[] flagCount;
 
     public Grid(int n) {
         this.n = n;
@@ -77,6 +82,7 @@ class Grid {
         // init all true propagated bitset
         propagated = new BitSet(n*n);
         propagated.flip(0, n*n);
+        flagCount = new int[n];
     }
 
     public Grid(int[][] grid) {
@@ -87,14 +93,16 @@ class Grid {
         flags.flip(0, n*n*n);
         // init all true propagated bitset
         propagated = new BitSet(n*n);
+        flagCount = new int[n];
         init(grid);
     }
 
-    private Grid(int n,int ns, BitSet flags, BitSet propagated) {
+    private Grid(int n,int ns, BitSet flags, BitSet propagated, int[] flagCount) {
         this.n = n;
         this.ns = ns;
         this.flags = flags;
         this.propagated = propagated;
+        this.flagCount = flagCount;
     }
 
     public void init(int[][] grid) {
@@ -171,6 +179,7 @@ class Grid {
      */
     public void mark(int f, int x, int y) {
         if(flags.get(index(x, y, f))) {
+            flagCount[f]++;
             flags.flip(index(x, y, f));
         }
     }
@@ -185,6 +194,23 @@ class Grid {
             }
         }
         return -1;
+    }
+
+    /**
+     *
+     */
+    public int getBestFlag(BitSet bs) {
+        int max = Integer.MAX_VALUE;
+        int max_i = -1;
+        for(int i = 0; i < n; i++) {
+            if(bs.get(i)) {
+                if(flagCount[i] < max) {
+                    max = flagCount[i];
+                    max_i = i;
+                }
+            }
+        }
+        return max_i;
     }
 
     /**
@@ -215,12 +241,8 @@ class Grid {
 
         // Fill in horizontal
         for (int i = 0; i < n; i++) {
-            flags.set(index(i, y, f), false);
-        }
-
-        // Fill in vertical
-        for (int i = 0; i < n; i++) {
-            flags.set(index(x, i, f), false);
+            mark(f, i, y);
+            mark(f, x, i);
         }
 
         // Fill in local block.
@@ -228,14 +250,14 @@ class Grid {
         int originY = (int) Math.floor((float) y / ns);
         for (int i = originX*ns; i < originX*ns + ns; i++) {
             for (int j = originY*ns; j < originY*ns + ns; j++) {
-                flags.set(index(i, j, f), false);
+                mark(f, i, j);
             }
         }
 
         // Set the square to the correct flag.
         // This is done last to simplify filling in (the above stuff).
-        for (int i = index(x, y); i < index(x, y) + n; i++) {
-            flags.set(i, false); // Assuming this is necessary.
+        for (int i = 0; i < n; i++) {
+            mark(i, x, y);
         }
         flags.set(index(x, y, f), true);
     }
@@ -272,10 +294,11 @@ class Grid {
     public Grid copy() {
         BitSet newFlags = new BitSet(n*n*n);
         BitSet newProp = new BitSet(n*n);
+        int[] newflagC = flagCount.clone();
         newFlags.or(flags);
         newProp.or(propagated);
 
-        return new Grid(n, ns, newFlags, newProp);
+        return new Grid(n, ns, newFlags, newProp, newflagC);
     }
 
     public boolean isSolved() {
