@@ -1,5 +1,3 @@
-package weblab;
-
 import java.util.*;
 
 class Solution {
@@ -14,80 +12,83 @@ class Solution {
     }
 }
 
+/**
+ * class corresponding to a grid
+ * contains a couple key values
+ * n length and width
+ * ns squareroot of n, length of one sub-block in the grid
+ * flags Bitset containing data about the grid. Each sudoku has n bits for each square
+ * each bit corresponds wether a number can be put there
+ */
 class Grid {
-    private final int block_size;
-
     private final int n;
     private final int ns;
     private final BitSet flags;
+    private final BitSet propagated;
 
     public Grid(int[][] grid) {
         n = grid.length;
         ns = (int) Math.sqrt(n);
-        block_size = n + 1;
-        flags = new BitSet(block_size*n*n);
+        flags = new BitSet(n*n*n);
+        propagated = new BitSet(n*n);
     }
 
+    /**
+     * returns the start index for a block for a given x and y
+     * @param x
+     * @param y
+     * @return
+     */
+    public int index(int x, int y) {
+        return n * (x*n+y);
+    }
+
+    /**
+     * returns the index for a given x, y and flag
+     * @param x
+     * @param y
+     * @return
+     */
+    public int index(int x, int y, int f) {
+        return index(x, y) + f;
+    }
+
+    /**
+     * returns a bitset block corresponding to the flags of a square in de sudoku.
+     * @param x
+     * @param y
+     * @return
+     */
+    public BitSet block(int x, int y) {
+        return flags.get(index(x, y), index(x, y+1));
+    }
+
+    /**
+     * Check wether a block can be solved, use isPropagated to check if it is propagated in de sudoku already
+     * @param x
+     * @param y
+     * @return
+     */
     public boolean isSolved(int x, int y) {
-        return flags.get(block_size*(x*n + y));
-    }
-
-    public boolean mark(int f, int x, int y) {
-        flags.flip(block_size*(x*n + y)+f);
-    }
-
-    public boolean isKnown(int x, int y) {
+        BitSet bs = block(x, y);
         int count = 0;
-        for(int i=1; i < block_size; i++) {
-            if(flags.get(block_size*(x*n +y)+i)) {
-                count++;
-            }
+        for (int i = bs.nextSetBit(0); i >= 0; i = bs.nextSetBit(i+1)) {
+            count+=1;
         }
         return count==1;
     }
 
-    public boolean canBeSolved(int x, int y) {
-        int count = 0;
-        for(int i=1; i < block_size; i++) {
-            if(flags.get(block_size*(x*n +y)+i)) {
-                count++;
-            }
+    /**
+     * marks a given flag for a given x and y in the bitset
+     * @param f
+     * @param x
+     * @param y
+     * @return
+     */
+    public void mark(int f, int x, int y) {
+        if(!flags.get(index(x, y, f))) {
+            flags.flip(index(x, y, f));
         }
-        return count>=1;
-    }
-
-    public boolean solveFor(int f, int x, int y) {
-        mark(0, x, y);
-        // mark horizontal and vertical
-        for(int i = 0; i < n; i++) {
-            if(i!=y){
-                mark(f,x, i);
-            }
-            if(i!=x) {
-                mark(f,i,y);
-            }
-        }
-        // mark block
-        int block_x = (int) Math.floor(x/ns);
-        int block_y = (int) Math.floor(y/ns);
-        for(int i = 0; i < ns; i++) {
-            for(int j = 0; j < ns; j++) {
-                mark(f, block_x*ns+i, block_y*ns+j);
-            }
-        }
-    }
-
-    public boolean canBeSolved() {
-        boolean b = true;
-        for(int x = 0; x < n; x++) {
-            for(int y = 0; y < n; y++) {
-                b = b && canBeSolved(x, y);
-            }
-        }
-    }
-
-    public void solve() {
-
     }
 
 }
